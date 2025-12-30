@@ -94,7 +94,7 @@ to suit the TP-Link Deco X80-5G target */
 	};
 
 	virtual_led_set: virtual-monocromatic-leds {
-		compatible = "leds-group-virtualcolor";
+		compatible = "leds-soft-mux";
 		// #address-cells = <1>;
 		// #size-cells = <0>;
 		/*note the LED's defined here are virtual
