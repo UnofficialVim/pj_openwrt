@@ -122,7 +122,8 @@ define Build/dwl8610ap-image
 	cp $@ $@.tmptar/rootfs.bin
 	# Hash the rootfs.bin
 	cat $@.tmptar/rootfs.bin | md5sum > $@.tmptar/rootfs.md5
-	cd $@.tmptar && tar -c -f $@.new *
+	cd $@.tmptar && $(TAR) -c -f $@.new --sort=name --numeric-owner --owner=0 --group=0 --mode=go-w \
+		$(if $(SOURCE_DATE_EPOCH),--mtime="@$(SOURCE_DATE_EPOCH)") *
 	rm -rf $@.tmptar
 	mv $@.new $@
 endef
@@ -343,7 +344,7 @@ define Device/linksys_ea9200
   DEVICE_VENDOR := Linksys
   DEVICE_MODEL := EA9200
   DEVICE_VARIANT := v1
-  DEVICE_PACKAGES := $(BRCMFMAC_43602A1) $(USB3_PACKAGES)
+  DEVICE_PACKAGES := $(BRCMFMAC_43602A1) $(USB3_PACKAGES) kmod-ledtrig-network
 endef
 TARGET_DEVICES += linksys_ea9200
 
@@ -405,9 +406,9 @@ define Device/meraki_mr26
 # resize the initramfs to fit the size of the existing part.safe.
   KERNEL_LOADADDR := 0x00008000
   KERNEL_INITRAMFS_SUFFIX := .bin
-  KERNEL_INITRAMFS := kernel-bin | append-dtb | gzip | uImage gzip | pad-to 9310208
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | libdeflate-gzip | uImage gzip | pad-to 9310208
 # LZMA is not supported by the uboot
-  KERNEL := kernel-bin | append-dtb | gzip | uImage gzip
+  KERNEL := kernel-bin | append-dtb | libdeflate-gzip | uImage gzip
   IMAGES += sysupgrade.bin
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
@@ -444,8 +445,8 @@ define Device/meraki_mx6x
   DEVICE_PACKAGES := -oseama kmod-leds-pwm kmod-usb-ehci \
 	kmod-usb-ohci kmod-usb2
   DEVICE_VENDOR := Cisco Meraki
-  KERNEL = kernel-bin | gzip | fit gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb
-  KERNEL_INITRAMFS := kernel-bin | gzip | fit gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb
+  KERNEL = kernel-bin | libdeflate-gzip | fit gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb
+  KERNEL_INITRAMFS := kernel-bin | libdeflate-gzip | fit gzip $$(DTS_DIR)/$$(DEVICE_DTS).dtb
   KERNEL_INITRAMFS_SUFFIX := .bin
   IMAGES := sysupgrade.bin
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
@@ -459,13 +460,13 @@ define Device/meraki_mx64
 endef
 TARGET_DEVICES += meraki_mx64
 
-define Device/meraki_mx64_a0
+define Device/meraki_mx64-a0
   $(call Device/meraki_mx64)
   DEVICE_VARIANT := A0
   DEVICE_DTS_CONFIG := config@2
   DEVICE_DTS := bcm958625-meraki-mx64-a0
 endef
-TARGET_DEVICES += meraki_mx64_a0
+TARGET_DEVICES += meraki_mx64-a0
 
 define Device/meraki_mx65
   $(call Device/meraki_mx6x)
