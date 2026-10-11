@@ -13,6 +13,11 @@ PKG_FLAGS:=nonshared
 
 include $(INCLUDE_DIR)/package.mk
 
+define Build/Prepare
+	$(call Build/Prepare/Default)
+	[ ! -d ./files ] || $(CP) ./files/. $(PKG_BUILD_DIR)/
+endef
+
 define Build/Compile
 endef
 
