@@ -6,7 +6,6 @@ LM63_BUS=0
 LM63_ADDR=0x4c
 
 start_service() {
-	# The LM63 drives 100% PWM for ~3s whenever the fan starts from a stop, whatever pwm1 says.
 	# Clear the spin-up bits (reg 0x4b, low 5) so it starts straight at the commanded duty. Needs i2c-tools.
 	if command -v i2cget >/dev/null; then
 		v=$(i2cget -f -y $LM63_BUS $LM63_ADDR 0x4b) && \
@@ -20,7 +19,7 @@ start_service() {
 }
 
 stop_service() {
-	# failsafe: nobody is controlling the fan, so go full speed
+	# failsafe: nobody is controlling the fan, run full speed
 	for h in /sys/class/hwmon/hwmon*; do
 		[ "$(cat $h/name)" = lm63 ] && echo 255 > $h/pwm1
 	done

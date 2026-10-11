@@ -1,7 +1,7 @@
 #!/bin/sh
-# shortcut: duty follows the hottest sensor only, no PID; upgrade if one source needs its own curve
-: ${ON:=50000} ${OFF:=45000} ${HI:=85000}   # millideg C: start at ON, stop at OFF, full speed at HI (env-overridable for testing)
-MIN=60                                      # lowest duty; you measured that 50 starts the fan from a stop
+# shortcut: duty follows the hottest sensor only, no PID;
+: ${ON:=50000} ${OFF:=45000} ${HI:=85000}   # millideg C: start at ON, stop at OFF, full speed at HI
+MIN=60                                      # lowest duty;
 UP=6 DOWN=2 TICK=2                          # max duty change per tick (up / down), tick length in seconds
 
 for h in /sys/class/hwmon/hwmon*; do
@@ -10,7 +10,7 @@ done
 [ -w "$PWM" ] || exit 1
 echo 1 > "${PWM}_enable"
 
-cur=0; running=0                            # never inherit the old duty (stop leaves it at 255)
+cur=0; running=0
 while :; do
 	T=0
 	for z in /sys/class/thermal/thermal_zone*/temp "${PWM%pwm1}temp2_input"; do
@@ -23,11 +23,11 @@ while :; do
 		[ "$running" = 0 ] && [ "$T" -ge "$ON" ] && running=1
 		[ "$running" = 1 ] && [ "$T" -le "$OFF" ] && running=0
 		if [ "$running" = 0 ]; then
-			cur=0                       # cool: off immediately
+			cur=0
 		else
 			if [ "$T" -le "$ON" ]; then tgt=$MIN
 			else tgt=$((MIN + (255 - MIN) * (T - ON) / (HI - ON))); fi
-			[ "$cur" -eq 0 ] && cur=$MIN    # start straight at MIN, no burst
+			[ "$cur" -eq 0 ] && cur=$MIN
 			if   [ "$cur" -lt $((tgt - UP)) ];   then cur=$((cur + UP))
 			elif [ "$cur" -gt $((tgt + DOWN)) ]; then cur=$((cur - DOWN))
 			else cur=$tgt; fi
