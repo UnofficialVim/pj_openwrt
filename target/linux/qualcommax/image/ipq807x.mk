@@ -547,7 +547,7 @@ define Device/ubiquiti_afi-aln-r
 	DEVICE_DTS_CONFIG := config@hk01
 	SOC := ipq8074
 	DEVICE_PACKAGES := ipq-wifi-ubiquiti_afi-aln-r kmod-ath10k-ct ath10k-firmware-qca9984-ct \
-		kmod-hci-uart kmod-hwmon-lm63
+		kmod-hci-uart alien-fan kmod-hwmon-lm63
 endef
 TARGET_DEVICES += ubiquiti_afi-aln-r
 
