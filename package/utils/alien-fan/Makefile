@@ -25,3 +25,5 @@ define Package/alien-fan/install
 	$(INSTALL_BIN) ./files/alien-fan $(1)/usr/sbin/alien-fan
 	$(INSTALL_BIN) ./files/alien-fan.init $(1)/etc/init.d/alien-fan
 endef
+
+$(eval $(call BuildPackage,alien-fan))
